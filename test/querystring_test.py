@@ -3,7 +3,6 @@
 import unittest
 
 from urlobject.query_string import QueryString
-from urlobject.six import u
 
 
 class QueryStringTest(unittest.TestCase):
@@ -32,7 +31,7 @@ class QueryStringTest(unittest.TestCase):
                 [('my weird field', 'q1!2"\'w$5&7/z8)?')])
 
     def test_list_correctly_decodes_utf_8(self):
-        assert QueryString('foo=%EF%BF%BD').list == [('foo', u('\ufffd'))]
+        assert QueryString('foo=%EF%BF%BD').list == [('foo', '\ufffd')]
 
     def test_list_doesnt_split_on_percent_encoded_special_chars(self):
         assert QueryString('a%26b%3Dc%3F=a%26b%3Dc%3F').list == [
@@ -90,7 +89,7 @@ class QueryStringTest(unittest.TestCase):
 
     def test_add_param_encodes_utf8(self):
         s = QueryString('abc=123')
-        assert s.add_param('foo', u('\ufffd')) == 'abc=123&foo=%EF%BF%BD'
+        assert s.add_param('foo', '\ufffd') == 'abc=123&foo=%EF%BF%BD'
 
     def test_add_param_accepts_int(self):
         s = QueryString('')

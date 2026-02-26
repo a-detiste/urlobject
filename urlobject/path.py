@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import posixpath
-import urllib
-
-from .compat import urlparse
-from .six import text_type, u
+from urllib import parse as urlparse
 
 
-class Root(object):
+class Root:
 
     """A descriptor which always returns the root path."""
 
@@ -15,12 +12,12 @@ class Root(object):
         return cls('/')
 
 
-class URLPath(text_type):
+class URLPath(str):
 
     root = Root()
 
     def __repr__(self):
-        return u('URLPath(%r)') % (text_type(self),)
+        return 'URLPath(%r)' % str(self)
 
     @classmethod
     def join_segments(cls, segments, absolute=True):
@@ -143,43 +140,15 @@ class URLPath(text_type):
         return type(self)(posixpath.join(self, path_encode(path, safe='/')))
 
 
-def _path_encode_py2(s, safe=''):
-    """Quote unicode or str using path rules."""
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    if isinstance(safe, unicode):
-        safe = safe.encode('utf-8')
-    return urllib.quote(s, safe=safe).decode('utf-8')
-
-
-def _path_encode_py3(s, safe=''):
+def path_encode(s, safe=''):
     """Quote str or bytes using path rules."""
     # s can be bytes or unicode, urllib.parse.quote() assumes
     # utf-8 if encoding is necessary.
     return urlparse.quote(s, safe=safe)
 
 
-def _path_decode_py2(s):
-    """Unquote unicode or str using path rules."""
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return urllib.unquote(s).decode('utf-8')
-
-
-def _path_decode_py3(s):
+def path_decode(s):
     """Unquote str or bytes using path rules."""
     if isinstance(s, bytes):
         s = s.decode('utf-8')
     return urlparse.unquote(s)
-
-
-if hasattr(urllib, 'quote'):
-    path_encode = _path_encode_py2
-    path_decode = _path_decode_py2
-    del _path_encode_py3
-    del _path_decode_py3
-else:
-    path_encode = _path_encode_py3
-    path_decode = _path_decode_py3
-    del _path_encode_py2
-    del _path_decode_py2

@@ -1,15 +1,12 @@
 import collections
 import re
-import urllib
-
-from .compat import urlparse
-from .six import PY2, text_type, string_types, u
+from urllib import parse as urlparse
 
 
-class QueryString(text_type):
+class QueryString(str):
 
     def __repr__(self):
-        return u('QueryString(%r)') % (text_type(self),)
+        return 'QueryString(%r)' % str(self)
 
     @property
     def list(self):
@@ -51,7 +48,7 @@ class QueryString(text_type):
     def add_param(self, name, value):
         if value is None:
             parameter = qs_encode(name)
-        elif not isinstance(value, string_types) and hasattr(value, '__iter__'):
+        elif not isinstance(value, str) and hasattr(value, '__iter__'):
             # value is a list or tuple
             parameter = '&'.join([qs_encode(name) + '=' + qs_encode(val) for val in value])
         else:
@@ -117,18 +114,7 @@ def get_params_list(*args, **kwargs):
     return params
 
 
-def _qs_encode_py2(s):
-    """Quote unicode or str using query string rules."""
-    if isinstance(s, (int, long)):
-        # Ease calling with int values which can be trivially stringified.
-        s = unicode(s)
-    if isinstance(s, unicode):
-        # urllib.quote_plus() requires str not unicode.
-        s = s.encode('utf-8')
-    return urllib.quote_plus(s).decode('utf-8')
-
-
-def _qs_encode_py3(s):
+def qs_encode(s):
     """Quote str or bytes using query string rules."""
     if isinstance(s, int):
         # Ease calling with int values which can be trivially stringified.
@@ -138,27 +124,8 @@ def _qs_encode_py3(s):
     return urlparse.quote_plus(s)
 
 
-def _qs_decode_py2(s):
-    """Unquote unicode or str using query string rules."""
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return urllib.unquote_plus(s).decode('utf-8')
-
-
-def _qs_decode_py3(s):
+def qs_decode(s):
     """Unquote str or bytes using query string rules."""
     if isinstance(s, bytes):
         s = s.decode('utf-8')
     return urlparse.unquote_plus(s)
-
-
-if PY2:
-    qs_encode = _qs_encode_py2
-    qs_decode = _qs_decode_py2
-    del _qs_encode_py3
-    del _qs_decode_py3
-else:
-    qs_encode = _qs_encode_py3
-    qs_decode = _qs_decode_py3
-    del _qs_encode_py2
-    del _qs_decode_py2

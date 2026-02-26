@@ -1,8 +1,7 @@
-from .compat import urlparse
-from .six import text_type, u
+from urllib import parse as urlparse
 
 
-class Netloc(text_type):
+class Netloc(str):
 
     """
     A netloc string (``username:password@hostname:port``).
@@ -12,7 +11,7 @@ class Netloc(text_type):
     """
 
     def __repr__(self):
-        return u('Netloc(%r)') % (text_type(self),)
+        return 'Netloc(%r)' % str(self)
 
     @classmethod
     def __unsplit(cls, username, password, hostname, port):

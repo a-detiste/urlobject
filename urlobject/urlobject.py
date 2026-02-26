@@ -1,11 +1,12 @@
-from .compat import urlparse
+from urllib import parse as urlparse
+
 from .netloc import Netloc
 from .path import URLPath, path_encode, path_decode
 from .ports import DEFAULT_PORTS
 from .query_string import QueryString
-from .six import text_type, u
 
-class URLObject(text_type):
+
+class URLObject(str):
 
     """
     A URL.
@@ -33,7 +34,7 @@ class URLObject(text_type):
     """
 
     def __repr__(self):
-        return u('URLObject(%r)') % (text_type(self),)
+        return 'URLObject(%r)' % str(self)
 
     @classmethod
     def from_iri(cls, iri):
@@ -54,7 +55,7 @@ class URLObject(text_type):
         The % character is *not* quoted, because users often copy/paste
         addresses that are already quoted, and we should not double-quote it.
 
-        >>> print(URLObject.from_iri(u('https://\xe9xample.com/p\xe5th')))
+        >>> print(URLObject.from_iri('https://\xe9xample.com/p\xe5th'))
         https://xn--xample-9ua.com/p%C3%A5th
         """
         # This code approximates Section 3.1 of RFC 3987, using the option of

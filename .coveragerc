@@ -2,8 +2,6 @@
 source =
   urlobject
   test
-omit =
-  urlobject/six.py
 
 [report]
 exclude_lines =
